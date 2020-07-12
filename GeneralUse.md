@@ -3,33 +3,44 @@ GeneralUse
 Brant Konetchy
 7/12/2020
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax
-for authoring HTML, PDF, and MS Word documents. For more details on
-using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that
-includes both content as well as the output of any embedded R code
-chunks within the document. You can embed an R code chunk like this:
-
 ``` r
-summary(cars)
+library(data.table)
+Make_Grid <- function(point_locs, cell_size, buffer){
+  # calculate the origin
+  x_origin = (min(point_locs$X)) - (cell_size * buffer)
+  y_origin = (min(point_locs$Y)) - (cell_size * buffer)
+  # calculate the farthest distance out
+  x_dist = (max(point_locs$X)) + (cell_size * buffer)
+  y_dist = (max(point_locs$Y)) + (cell_size * buffer)
+  # grid check, if last value in sequance is not greater than distance in x and y need to add one more cell size to vector
+  x_seq <- seq(x_origin ,x_dist, cell_size)
+  if (max(x_seq) < (x_dist - cell_size/2)){
+    x_seq <- c(x_seq, max(x_seq) + cell_size)
+  }
+  y_seq <- seq(y_origin ,y_dist, cell_size)
+  if (max(y_seq) < (y_dist - cell_size/2)){
+    y_seq <- c(y_seq, max(y_seq) + cell_size)
+  }
+  # create grid data set
+  grid_data <- CJ(x = x_seq, y = y_seq)
+  # add cell information
+  grid_data$cell_size = cell_size
+  grid_data$cell_id = 1:nrow(grid_data)
+  grid_data
+}
+# Make sure the X and Y are capatilzed
+test_points <- data.table(X = c(4,8, 10), Y = c(2, 9, 6))
+
+grid <- Make_Grid(point_locs = test_points, cell_size = 1, buffer = 0)
 ```
 
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
+<br/> **Plot the Results**
 
-## Including Plots
+``` r
+library(ggplot2)
+ggplot() +
+  geom_point(data = test_points, aes(x = X, y = Y), color = 'steelblue', size = 4) +
+  geom_rect(data = grid, aes(xmin = x - cell_size/2, ymin = y - cell_size/2, xmax = x + cell_size/2, ymax = y + cell_size/2), color = 'black', fill = NA)
+```
 
-You can also embed plots, for example:
-
-![](GeneralUse_files/figure-gfm/pressure-1.png)<!-- -->
-
-Note that the `echo = FALSE` parameter was added to the code chunk to
-prevent printing of the R code that generated the plot.
+![](GeneralUse_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
