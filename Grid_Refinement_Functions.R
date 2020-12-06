@@ -13,11 +13,11 @@ Make_Grid <- function(x_coords, y_coords, cell_size, buffer){
   y_dist = ceiling(max(y_coords)) + (cell_size * buffer)
   # grid check, if last value in the sequence is not greater than distance in x and y need to add one more cell size to vector
   x_seq <- seq(x_origin ,x_dist, cell_size)
-  if (max(x_seq) < (x_dist - cell_size/2)){
+  if (max(x_seq) <= (x_dist - cell_size/2)){
     x_seq <- c(x_seq, max(x_seq) + cell_size)
   }
   y_seq <- seq(y_origin ,y_dist, cell_size)
-  if (max(y_seq) < (y_dist - cell_size/2)){
+  if (max(y_seq) <= (y_dist - cell_size/2)){
     y_seq <- c(y_seq, max(y_seq) + cell_size)
   }
   # create grid data set
@@ -36,7 +36,7 @@ Ghost_Nodes <- function(Grid, x_coords, y_coords, ref_method){
       temp_point_y <- y_coords[a]
       temp_cell_size <- min(Grid$cell_size)
       # locate cell ids
-      Grid_Nodes <- Grid[between(x = x, lower = temp_point_x-temp_cell_size/2, upper = temp_point_x+temp_cell_size/2, incbounds = T)][between(x = y, lower = temp_point_y-temp_cell_size/2, upper = temp_point_y+temp_cell_size/2)]
+      Grid_Nodes <- Grid[between(x = x, lower = temp_point_x-temp_cell_size/2, upper = temp_point_x+temp_cell_size/2, incbounds = T)][between(x = y, lower = temp_point_y-temp_cell_size/2, upper = temp_point_y+temp_cell_size/2, incbounds = T)]
       
       Grid_Nodes <- Grid_Nodes[cell_size == min(Grid_Nodes$cell_size)][1]
       
